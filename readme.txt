@@ -1,2 +1,1 @@
-Game of Life
-C++
+Game of Life - C++
