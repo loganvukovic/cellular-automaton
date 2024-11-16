@@ -1,20 +1,37 @@
-// Game of Life.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
+#include <vector>
+using namespace std;
+
+vector<vector<int>> DeadState(int height, int width)
+{
+	vector<vector<int>> deadBoard;
+
+	for (int i = 0; i < height; i++)
+	{
+		deadBoard.push_back({});
+
+		for (int j = 0; j < width; j++)
+		{
+			deadBoard[i].push_back(0);
+		}
+	}
+
+	return deadBoard;
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	int width = 5;
+	int height = 5;
+
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			cout << DeadState(height, width)[i][j] << " ";
+		}
+		cout << endl;
+	}
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
