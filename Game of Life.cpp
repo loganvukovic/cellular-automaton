@@ -13,8 +13,48 @@ void setupConsole()
     SetConsoleCP(CP_UTF8);
 }
 
+vector<vector<int>> nextState(vector<vector<int>> board)
+{
+    vector<vector<int>> nextState(board.size() - 1, vector<int>(board[0].size() - 1, 0));
+    int curNeighbor = 0;
+
+    for (int i = 0; i < board.size(); i++)
+    {
+        for (int j = 0; j < board.size(); j++)
+        {
+            //Count Neighbors
+            //
+            if (i != 0)
+            {
+                if (board[i - 1][j] == 1) curNeighbor++;
+                if (j != 0 && board[i - 1][j - 1] == 1) curNeighbor++;
+                if (j != board[i].size() - 1 && board[i - 1][j + 1] == 1) curNeighbor++;
+            }
+            if (i != board.size() - 1)
+            {
+                if (board[i + 1][j] == 1) curNeighbor++;
+                if (j != 0 && board[i + 1][j - 1] == 1) curNeighbor++;
+                if (j != board[i].size() - 1 && board[i + 1][j + 1] == 1) curNeighbor++;
+            }
+            if (j != 0)
+            {
+                if (board[i][j - 1] == 1) curNeighbor++;
+            }
+            if (j != board[i].size() - 1)
+            {
+                if (board[i][j + 1] == 1) curNeighbor++;
+            }
+            cout << curNeighbor;
+            curNeighbor = 0;
+        }
+    }
+
+    return nextState;
+}
+
+
 //Output Unicode characters using WriteConsoleW
-void renderUnicodeBoard(vector<vector<int>> board) 
+void renderBoard(vector<vector<int>> board) 
 {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -37,6 +77,9 @@ void renderUnicodeBoard(vector<vector<int>> board)
         const wchar_t newline[] = L"\n";
         WriteConsoleW(hConsole, newline, wcslen(newline), nullptr, nullptr);
     }
+    cout << endl;
+
+    //renderBoard(nextState(board));
 }
 
 vector<vector<int>> DeadState(int height, int width) 
@@ -67,8 +110,11 @@ int main()
 {
     setupConsole();
 
-    int width = 60;
-    int height = 30;
+    int width = 5;
+    int height = 5;
 
-    renderUnicodeBoard(RandomState(height, width));
+
+    vector<vector<int>> board = RandomState(height,width);
+    renderBoard(board);
+    nextState(board);
 }
