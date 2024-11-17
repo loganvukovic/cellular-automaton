@@ -14,6 +14,7 @@ void setupConsole()
     SetConsoleCP(CP_UTF8);
 }
 
+//Calculate next state
 vector<vector<int>> nextState(vector<vector<int>> neighbors, vector<vector<int>> originalState, int height, int width)
 {
     vector<vector<int>> nextState(neighbors.size(), vector<int>(neighbors[0].size(), 0));
@@ -21,20 +22,25 @@ vector<vector<int>> nextState(vector<vector<int>> neighbors, vector<vector<int>>
     {
         for (int j = 0; j < width; j++)
         {
+            //If a cell is dead and has three neighbors, it comes to life
             if (originalState[i][j] == 0 && neighbors[i][j] == 3)
                 nextState[i][j] = 1;
+            //If a cell is alive...
             else if (originalState[i][j] == 1)
             {
+                //... and has few neighbors, it dies to underpopulation
                 if (neighbors[i][j] == 0 || neighbors[i][j] == 1)
                     nextState[i][j] = 0;
+                //...and has the right number of neighbors, it survives
                 else if (neighbors[i][j] == 2 || neighbors[i][j] == 3)
                     nextState[i][j] = 1;
+                //...and has too many neighbors, it dies to overpopulation
                 else if (neighbors[i][j] > 3)
                     nextState[i][j] = 0;
             }
         }
     }
-    system("pause");
+    Sleep(300);
     renderBoard(nextState);
     return nextState;
 }
@@ -46,8 +52,6 @@ void CountNeighbors(vector<vector<int>> board, int height, int width)
 
     for (int i = 0; i < height; i++)
     {
-        //cout << board.size();
-        //cout << board[0].size();
         for (int j = 0; j < width; j++)
         {
             //Top three neighbors
@@ -87,6 +91,8 @@ void renderBoard(vector<vector<int>> board)
 {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
+    cout << endl;
+
     for (int i = 0; i < board.size(); ++i) 
     {
         for (int j = 0; j < board[i].size(); ++j) 
@@ -109,7 +115,6 @@ void renderBoard(vector<vector<int>> board)
             WriteConsoleW(hConsole, newline, wcslen(newline), nullptr, nullptr);
         }
     }
-    cout << endl;
 
     CountNeighbors(board, board.size(), board[0].size());
 }
@@ -120,6 +125,7 @@ vector<vector<int>> DeadState(int height, int width)
     return deadBoard;
 }
 
+//Generate random starting state
 vector<vector<int>> RandomState(int height, int width) 
 {
     vector<vector<int>> randomBoard = DeadState(height, width);
@@ -148,5 +154,4 @@ int main()
 
     vector<vector<int>> board = RandomState(height,width);
     renderBoard(board);
-    CountNeighbors(board, height, width);
 }
