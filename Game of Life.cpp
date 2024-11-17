@@ -13,46 +13,6 @@ void setupConsole()
     SetConsoleCP(CP_UTF8);
 }
 
-vector<vector<int>> nextState(vector<vector<int>> board)
-{
-    vector<vector<int>> nextState(board.size() - 1, vector<int>(board[0].size() - 1, 0));
-    int curNeighbor = 0;
-
-    for (int i = 0; i < board.size(); i++)
-    {
-        for (int j = 0; j < board.size(); j++)
-        {
-            //Count Neighbors
-            //
-            if (i != 0)
-            {
-                if (board[i - 1][j] == 1) curNeighbor++;
-                if (j != 0 && board[i - 1][j - 1] == 1) curNeighbor++;
-                if (j != board[i].size() - 1 && board[i - 1][j + 1] == 1) curNeighbor++;
-            }
-            if (i != board.size() - 1)
-            {
-                if (board[i + 1][j] == 1) curNeighbor++;
-                if (j != 0 && board[i + 1][j - 1] == 1) curNeighbor++;
-                if (j != board[i].size() - 1 && board[i + 1][j + 1] == 1) curNeighbor++;
-            }
-            if (j != 0)
-            {
-                if (board[i][j - 1] == 1) curNeighbor++;
-            }
-            if (j != board[i].size() - 1)
-            {
-                if (board[i][j + 1] == 1) curNeighbor++;
-            }
-            cout << curNeighbor;
-            curNeighbor = 0;
-        }
-    }
-
-    return nextState;
-}
-
-
 //Output Unicode characters using WriteConsoleW
 void renderBoard(vector<vector<int>> board) 
 {
@@ -74,12 +34,83 @@ void renderBoard(vector<vector<int>> board)
                 WriteConsoleW(hConsole, spaceChar, wcslen(spaceChar), nullptr, nullptr);
             }
         }
-        const wchar_t newline[] = L"\n";
-        WriteConsoleW(hConsole, newline, wcslen(newline), nullptr, nullptr);
+        if (i != board.size() - 1)
+        {
+            const wchar_t newline[] = L"\n";
+            WriteConsoleW(hConsole, newline, wcslen(newline), nullptr, nullptr);
+        }
     }
     cout << endl;
 
     //renderBoard(nextState(board));
+}
+
+vector<vector<int>> nextState(vector<vector<int>> neighbors, vector<vector<int>> originalState, int height, int width)
+{
+    vector<vector<int>> nextState(neighbors.size(), vector<int>(neighbors[0].size(), 0));
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            if (originalState[i][j] == 0 && neighbors[i][j] == 3)
+                nextState[i][j] = 1;
+            else if (originalState[i][j] == 1)
+            {
+                if (neighbors[i][j] == 0 || neighbors[i][j] == 1)
+                    nextState[i][j] = 0;
+                else if (neighbors[i][j] == 2 || neighbors[i][j] == 3)
+                    nextState[i][j] = 1;
+                else if (neighbors[i][j] > 3)
+                    nextState[i][j] = 0;
+            }
+        }
+    }
+
+    renderBoard(nextState);
+    return nextState;
+}
+
+void CountNeighbors(vector<vector<int>> board, int height, int width)
+{
+    vector<vector<int>> neighborMatrix(board.size(), vector<int>(board[0].size(), 0));
+    int curNeighbor = 0;
+
+    for (int i = 0; i < height; i++)
+    {
+        //cout << board.size();
+        //cout << board[0].size();
+        for (int j = 0; j < width; j++)
+        {
+            //Top three neighbors
+            if (i != 0)
+            {
+                if (board[i - 1][j] == 1) curNeighbor++;
+                if (j != 0 && board[i - 1][j - 1] == 1) curNeighbor++;
+                if (j != board[i].size() - 1 && board[i - 1][j + 1] == 1) curNeighbor++;
+            }
+            //Bottom three neighbors
+            if (i != board.size() - 1)
+            {
+                if (board[i + 1][j] == 1) curNeighbor++;
+                if (j != 0 && board[i + 1][j - 1] == 1) curNeighbor++;
+                if (j != board[i].size() - 1 && board[i + 1][j + 1] == 1) curNeighbor++;
+            }
+            //Direct left neighbor
+            if (j != 0)
+            {
+                if (board[i][j - 1] == 1) curNeighbor++;
+            }
+            //Direct right neighbor
+            if (j != board[i].size() - 1)
+            {
+                if (board[i][j + 1] == 1) curNeighbor++;
+            }
+            neighborMatrix[i][j] = curNeighbor;
+            curNeighbor = 0;
+        }
+    }
+
+    nextState(neighborMatrix, board, height, width);
 }
 
 vector<vector<int>> DeadState(int height, int width) 
@@ -110,11 +141,11 @@ int main()
 {
     setupConsole();
 
-    int width = 5;
-    int height = 5;
+    int width = 60;
+    int height = 30;
 
 
     vector<vector<int>> board = RandomState(height,width);
     renderBoard(board);
-    nextState(board);
+    CountNeighbors(board, height, width);
 }
