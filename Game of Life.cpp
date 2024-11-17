@@ -3,46 +3,15 @@
 #include <ctime>
 #include <windows.h>
 #pragma execution_character_set("CP_UTF8")
-
 using namespace std;
+
+void renderBoard(vector<vector<int>>);
 
 //Initialize the console for UTF-8 output
 void setupConsole() 
 {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
-}
-
-//Output Unicode characters using WriteConsoleW
-void renderBoard(vector<vector<int>> board) 
-{
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    for (int i = 0; i < board.size(); ++i) 
-    {
-        for (int j = 0; j < board[i].size(); ++j) 
-        {
-            if (board[i][j] == 1) 
-            {
-                //Render 1 as ■
-                const wchar_t blockChar[] = L"\u25A0";
-                WriteConsoleW(hConsole, blockChar, wcslen(blockChar), nullptr, nullptr);
-            }
-            else 
-            {
-                const wchar_t spaceChar[] = L" ";
-                WriteConsoleW(hConsole, spaceChar, wcslen(spaceChar), nullptr, nullptr);
-            }
-        }
-        if (i != board.size() - 1)
-        {
-            const wchar_t newline[] = L"\n";
-            WriteConsoleW(hConsole, newline, wcslen(newline), nullptr, nullptr);
-        }
-    }
-    cout << endl;
-
-    //renderBoard(nextState(board));
 }
 
 vector<vector<int>> nextState(vector<vector<int>> neighbors, vector<vector<int>> originalState, int height, int width)
@@ -65,7 +34,7 @@ vector<vector<int>> nextState(vector<vector<int>> neighbors, vector<vector<int>>
             }
         }
     }
-
+    system("pause");
     renderBoard(nextState);
     return nextState;
 }
@@ -111,6 +80,38 @@ void CountNeighbors(vector<vector<int>> board, int height, int width)
     }
 
     nextState(neighborMatrix, board, height, width);
+}
+
+//Output Unicode characters using WriteConsoleW
+void renderBoard(vector<vector<int>> board) 
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    for (int i = 0; i < board.size(); ++i) 
+    {
+        for (int j = 0; j < board[i].size(); ++j) 
+        {
+            if (board[i][j] == 1) 
+            {
+                //Render 1 as ■
+                const wchar_t blockChar[] = L"\u25A0";
+                WriteConsoleW(hConsole, blockChar, wcslen(blockChar), nullptr, nullptr);
+            }
+            else 
+            {
+                const wchar_t spaceChar[] = L" ";
+                WriteConsoleW(hConsole, spaceChar, wcslen(spaceChar), nullptr, nullptr);
+            }
+        }
+        if (i != board.size() - 1)
+        {
+            const wchar_t newline[] = L"\n";
+            WriteConsoleW(hConsole, newline, wcslen(newline), nullptr, nullptr);
+        }
+    }
+    cout << endl;
+
+    CountNeighbors(board, board.size(), board[0].size());
 }
 
 vector<vector<int>> DeadState(int height, int width) 
