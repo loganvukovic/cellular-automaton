@@ -2,6 +2,7 @@
 #include <vector>
 #include <ctime>
 #include <windows.h>
+#include <fstream>
 #pragma execution_character_set("CP_UTF8")
 using namespace std;
 
@@ -105,7 +106,7 @@ void renderBoard(vector<vector<int>> board)
             }
             else 
             {
-                const wchar_t spaceChar[] = L" ";
+                const wchar_t spaceChar[] = L"  ";
                 WriteConsoleW(hConsole, spaceChar, wcslen(spaceChar), nullptr, nullptr);
             }
         }
@@ -144,14 +145,81 @@ vector<vector<int>> RandomState(int height, int width)
     return randomBoard;
 }
 
+void loadFromFile()
+{
+    fstream file("input.txt");
+    int column = 0;
+    int maxColumn = 0;
+    int row = 0;
+    char c;
+
+    vector<vector<int>> fileBoard;
+    fileBoard.push_back({});
+        
+    while (file.get(c))
+    {
+        if (c == '\n')
+        {
+            if (row > 0 && column < maxColumn)
+            {
+                cout << "Invalid input. Proceeding with random life generation.\n";
+                Sleep(3000);
+                return;
+            }
+            fileBoard.push_back({});
+            row++;
+            maxColumn = column;
+            column = 0;
+        }
+        else if (c == '0' || c == '1')
+        {
+            if (row > 0 && column >= maxColumn)
+            {
+                cout << "Invalid input. Proceeding with random life generation.\n";
+                Sleep(3000);
+                return;
+            }
+            int x = c - '0';
+            fileBoard[row].push_back(x);
+            column++;
+        }
+        else
+        {
+            cout << "Invalid input. Proceeding with random life generation.\n";
+            Sleep(3000);
+            return;
+        }
+    }
+    file.close();
+    if (column < maxColumn || column > maxColumn)
+    {
+        cout << "Invalid input. Proceeding with random life generation.\n";
+        Sleep(3000);
+        return;
+    }
+
+    renderBoard(fileBoard);
+}
+
 int main() 
 {
     setupConsole();
 
-    int width = 60;
+    fstream file("input.txt");
+    //Check if file is empty
+    if (file.peek() != std::ifstream::traits_type::eof())
+        loadFromFile();
+
+    //If no input provided, proceed with random generation
+    int width = 58;
     int height = 30;
 
+    cout << "Enter height: ";
+    cin >> height;
+    cout << "Enter width: ";
+    cin >> width;
+    cout << endl;
 
-    vector<vector<int>> board = RandomState(height,width);
+    vector<vector<int>> board = RandomState(height, width);
     renderBoard(board);
 }
