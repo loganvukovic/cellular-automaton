@@ -1,9 +1,10 @@
 ﻿  Game of Life.cpp
-D:\Projects\Game of Life\Game of Life.cpp(6,9): warning C4695: #pragma execution_character_set: 'CP_UTF8' is not a supported argument: currently only 'UTF-8' is supported
-D:\Projects\Game of Life\Game of Life.cpp(105,58): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
-D:\Projects\Game of Life\Game of Life.cpp(110,58): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
-D:\Projects\Game of Life\Game of Life.cpp(116,52): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
-D:\Projects\Game of Life\Game of Life.cpp(120,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\Projects\Game of Life\Game of Life.cpp(120,37): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\Projects\Game of Life\Game of Life.cpp(133,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\Projects\Game of Life\Game of Life.cpp(168,58): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+D:\Projects\Game of Life\Game of Life.cpp(173,58): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+D:\Projects\Game of Life\Game of Life.cpp(179,52): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+D:\Projects\Game of Life\Game of Life.cpp(186,58): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Projects\Game of Life\Game of Life.cpp(186,41): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Projects\Game of Life\Game of Life.cpp(189,58): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Projects\Game of Life\Game of Life.cpp(189,41): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Projects\Game of Life\Game of Life.cpp(204,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   Game of Life.vcxproj -> D:\Projects\Game of Life\x64\Debug\Game of Life.exe

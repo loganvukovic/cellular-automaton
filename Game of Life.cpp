@@ -3,13 +3,11 @@
 #include <ctime>
 #include <windows.h>
 #include <fstream>
-#pragma execution_character_set("CP_UTF8")
 using namespace std;
 
-void renderBoard(vector<vector<int>>);
+void renderBoard(vector<vector<int>>, int, int, char, int);
 
-//Initialize the console for UTF-8 output
-void setupConsole() 
+void setupConsole()
 {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
@@ -42,7 +40,71 @@ vector<vector<int>> nextState(vector<vector<int>> neighbors, vector<vector<int>>
         }
     }
     Sleep(300);
-    renderBoard(nextState);
+    renderBoard(nextState, 0, 0, 'N', 1);
+    return nextState;
+}
+
+vector<vector<int>> langtonAntNext(vector<vector<int>> originalState, int height, int width, int antX, int antY, char antDirection)
+{
+    vector<vector<int>> nextState(originalState.size(), vector<int>(originalState[0].size(), 0));
+    nextState = originalState;
+
+    if (nextState[antY][antX] == 0)
+    {
+        nextState[antY][antX] = 1;
+        switch (antDirection)
+        {
+        case 'N':
+            antDirection = 'E';
+            break;
+        case 'E':
+            antDirection = 'S';
+            break;
+        case 'S':
+            antDirection = 'W';
+            break;
+        case 'W':
+            antDirection = 'N';
+            break;
+        }
+    }
+    else
+    {
+        nextState[antY][antX] = 0;
+        switch (antDirection)
+        {
+        case 'N':
+            antDirection = 'W';
+            break;
+        case 'W':
+            antDirection = 'S';
+            break;
+        case 'S':
+            antDirection = 'E';
+            break;
+        case 'E':
+            antDirection = 'N';
+            break;
+        }
+    }
+
+    switch (antDirection)
+    {
+    case 'N':
+        antY--;
+        break;
+    case 'W':
+        antX--;
+        break;
+    case 'S':
+        antY++;
+        break;
+    case 'E':
+        antX++;
+        break;
+    }
+    Sleep(300);
+    renderBoard(nextState, antX, antY, antDirection, 2);
     return nextState;
 }
 
@@ -88,7 +150,7 @@ void CountNeighbors(vector<vector<int>> board, int height, int width)
 }
 
 //Output Unicode characters using WriteConsoleW
-void renderBoard(vector<vector<int>> board) 
+void renderBoard(vector<vector<int>> board, int antX, int antY, char antDirection, int rule) 
 {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -117,7 +179,15 @@ void renderBoard(vector<vector<int>> board)
         }
     }
 
-    CountNeighbors(board, board.size(), board[0].size());
+    switch (rule)
+    {
+    case 1:
+        CountNeighbors(board, board.size(), board[0].size());
+        break;
+    case 2:
+        langtonAntNext(board, board.size(), board[0].size(), antX, antY, antDirection);
+        break;
+    }
 }
 
 vector<vector<int>> DeadState(int height, int width) 
@@ -198,17 +268,70 @@ void loadFromFile()
         return;
     }
 
-    renderBoard(fileBoard);
+    renderBoard(fileBoard, 0, 0, 'N', 1);
+}
+
+void StartLife(int rule)
+{
+    int width = 58;
+    int height = 30;
+
+    cout << "Enter height: ";
+    cin >> height;
+    cout << "Enter width: ";
+    cin >> width;
+    cout << endl;
+    vector<vector<int>> board = RandomState(height, width);
+    CountNeighbors(board, height, width);
+}
+
+void StartAnt(int rule)
+{
+    int height = 50;
+    int width = 50;
+    int antX = width / 2;
+    int antY = height / 2;
+
+    vector<vector<int>> board = DeadState(height, width);
+    langtonAntNext(board, height, width, antX, antY, 'N');
+}
+
+void SelectRules(int rule)
+{
+    switch (rule)
+    {
+    case 1:
+        StartLife(rule);
+        break;
+    case 2:
+        StartAnt(rule);
+        break;
+    }
 }
 
 int main() 
 {
     setupConsole();
 
+    int rule = 0;
+
+    cout << "Select your rule:" << endl << endl
+        << "1. Conway's Game of Life" << endl
+        << "2. Langton's Ant" << endl << endl;
+    while (true)
+    {
+        cin >> rule;
+        if (rule > 0 && rule < 3)
+            break;
+        else cout << "Not a valid rule. Select again." << endl;
+    }
+
+
+    SelectRules(rule);
     fstream file("input.txt");
     //Check if file is empty
-    if (file.peek() != std::ifstream::traits_type::eof())
-        loadFromFile();
+    /*if (file.peek() != std::ifstream::traits_type::eof())
+        loadFromFile();*/
 
     //If no input provided, proceed with random generation
     int width = 58;
@@ -220,6 +343,12 @@ int main()
     cin >> width;
     cout << endl;
 
-    vector<vector<int>> board = RandomState(height, width);
-    renderBoard(board);
+    int antX = width / 2;
+    int antY = height / 2;
+
+    /*vector<vector<int>> board = DeadState(height, width);
+    renderBoard(board, antX, antY, 'N');*/
+
+    /*vector<vector<int>> board = RandomState(height, width);
+    renderBoard(board);*/
 }
