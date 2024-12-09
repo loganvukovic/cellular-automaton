@@ -190,6 +190,36 @@ void renderBoard(vector<vector<int>> board, int antX, int antY, char antDirectio
     }
 }
 
+void renderBoardOnce(vector<vector<int>> board, int antX, int antY, char antDirection)
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    cout << endl;
+
+    for (int i = 0; i < board.size(); ++i)
+    {
+        for (int j = 0; j < board[i].size(); ++j)
+        {
+            if (board[i][j] == 1)
+            {
+                //Render 1 as ■
+                const wchar_t blockChar[] = L"\u25A0";
+                WriteConsoleW(hConsole, blockChar, wcslen(blockChar), nullptr, nullptr);
+            }
+            else
+            {
+                const wchar_t spaceChar[] = L"  ";
+                WriteConsoleW(hConsole, spaceChar, wcslen(spaceChar), nullptr, nullptr);
+            }
+        }
+        if (i != board.size() - 1)
+        {
+            const wchar_t newline[] = L"\n";
+            WriteConsoleW(hConsole, newline, wcslen(newline), nullptr, nullptr);
+        }
+    }
+}
+
 vector<vector<int>> DeadState(int height, int width) 
 {
     vector<vector<int>> deadBoard(height, vector<int>(width, 0));
@@ -215,7 +245,7 @@ vector<vector<int>> RandomState(int height, int width)
     return randomBoard;
 }
 
-void loadFromFile()
+vector<vector<int>> loadFromFile()
 {
     fstream file("input.txt");
     int column = 0;
@@ -234,7 +264,7 @@ void loadFromFile()
             {
                 cout << "Invalid input. Proceeding with random life generation.\n";
                 Sleep(3000);
-                return;
+                return DeadState(1, 1);
             }
             fileBoard.push_back({});
             row++;
@@ -247,7 +277,7 @@ void loadFromFile()
             {
                 cout << "Invalid input. Proceeding with random life generation.\n";
                 Sleep(3000);
-                return;
+                return DeadState(1, 1);
             }
             int x = c - '0';
             fileBoard[row].push_back(x);
@@ -257,7 +287,7 @@ void loadFromFile()
         {
             cout << "Invalid input. Proceeding with random life generation.\n";
             Sleep(3000);
-            return;
+            return DeadState(1, 1);
         }
     }
     file.close();
@@ -265,10 +295,62 @@ void loadFromFile()
     {
         cout << "Invalid input. Proceeding with random life generation.\n";
         Sleep(3000);
-        return;
+        return DeadState(1, 1);
     }
 
-    renderBoard(fileBoard, 0, 0, 'N', 1);
+    return fileBoard;
+
+    //renderBoard(fileBoard, 0, 0, 'N', 1);
+}
+
+//Emplaces board from file into larger board to prevent out of bounds errors
+vector<vector<int>> FillAntBoard(vector<vector<int>> fileBoard)
+{
+    vector<vector<int>> fullBoard = DeadState(50, 50);
+
+    int startingX, startingY, endingX, endingY;
+    startingX = 50 / 2 - fileBoard.size() / 2;
+    endingX = 50 / 2 + fileBoard.size() / 2;
+    startingY = 50 / 2 - fileBoard[0].size() / 2;
+    endingY = 50 / 2 + fileBoard[0].size() / 2;
+    int row = 0;
+    int column = 0;
+
+    for (int i = 0; i < 50; i++)
+    {
+        for (int j = 0; j < 50; j++)
+        {
+            cout << fullBoard[i][j];
+        }
+        cout << endl;
+    } 
+
+    cout << endl;
+
+    if (fileBoard.size() % 2 == 0)
+    {
+        endingX--;
+    }
+    if (fileBoard[0].size() % 2 == 0)
+    {
+        endingY--;
+    }
+
+    for (int i = startingX; i <= endingX; i++)
+    {
+        for (int j = startingY; j <= endingY; j++)
+        {
+            fullBoard[i][j] = fileBoard[row][column];
+            column++;
+            cout << fullBoard[i][j];
+        }
+        row++;
+        column = 0;
+        cout << endl;
+    }
+
+    return fullBoard;
+
 }
 
 void StartLife(int rule)
@@ -276,10 +358,16 @@ void StartLife(int rule)
     fstream file("input.txt");
     //Check if file is empty
     if (file.peek() != std::ifstream::traits_type::eof())
-        loadFromFile();
+    {
+        vector<vector<int>> fileBoard = loadFromFile();
+        if (fileBoard != DeadState(1, 1))
+        {
+            renderBoardOnce(fileBoard, 0, 0, 'N');
+            CountNeighbors(fileBoard, fileBoard.size(), fileBoard[0].size());
+        }
+    }
 
     //If no input provided, proceed with random generation
-
     int width = 58;
     int height = 30;
 
@@ -294,6 +382,20 @@ void StartLife(int rule)
 
 void StartAnt(int rule)
 {
+    fstream file("input.txt");
+    //Check if file is empty
+    if (file.peek() != std::ifstream::traits_type::eof())
+    {
+        vector<vector<int>> fileBoard = loadFromFile();
+
+        if (fileBoard != DeadState(1, 1))
+        {
+            vector<vector<int>> fullBoard = FillAntBoard(fileBoard);
+            langtonAntNext(fullBoard, 50, 50, 50 / 2, 50 / 2, 'N');
+        }
+    }
+
+    //If no input provided, proceed with random generation
     int height = 50;
     int width = 50;
     int antX = width / 2;
