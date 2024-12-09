@@ -273,6 +273,13 @@ void loadFromFile()
 
 void StartLife(int rule)
 {
+    fstream file("input.txt");
+    //Check if file is empty
+    if (file.peek() != std::ifstream::traits_type::eof())
+        loadFromFile();
+
+    //If no input provided, proceed with random generation
+
     int width = 58;
     int height = 30;
 
@@ -326,29 +333,5 @@ int main()
         else cout << "Not a valid rule. Select again." << endl;
     }
 
-
     SelectRules(rule);
-    fstream file("input.txt");
-    //Check if file is empty
-    /*if (file.peek() != std::ifstream::traits_type::eof())
-        loadFromFile();*/
-
-    //If no input provided, proceed with random generation
-    int width = 58;
-    int height = 30;
-
-    cout << "Enter height: ";
-    cin >> height;
-    cout << "Enter width: ";
-    cin >> width;
-    cout << endl;
-
-    int antX = width / 2;
-    int antY = height / 2;
-
-    /*vector<vector<int>> board = DeadState(height, width);
-    renderBoard(board, antX, antY, 'N');*/
-
-    /*vector<vector<int>> board = RandomState(height, width);
-    renderBoard(board);*/
 }
